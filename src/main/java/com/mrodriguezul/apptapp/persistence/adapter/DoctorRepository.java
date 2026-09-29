@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.persistence.adapter;
 
 import com.mrodriguezul.apptapp.domain.model.Doctor;
+import com.mrodriguezul.apptapp.domain.repository.IDoctorRepository;
 import com.mrodriguezul.apptapp.persistence.crud.DoctorCrudRepository;
 import com.mrodriguezul.apptapp.persistence.crud.PersonCrudRepository;
 import com.mrodriguezul.apptapp.persistence.entity.DoctorEntity;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DoctorRepository implements com.mrodriguezul.apptapp.domain.repository.IDoctorRepository {
+public class DoctorRepository implements IDoctorRepository {
     @Autowired
     private DoctorCrudRepository doctorCrudRepository;
 
