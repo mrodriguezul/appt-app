@@ -11,8 +11,8 @@ create table speciality (
 
 create table person (
   id bigint primary key generated always as identity,
-  identification_id bigint not null references identification (id),
-  identification_number varchar(20) not null unique,
+  document_type_code varchar(2) not null,
+  document_number varchar(20) not null unique,
   names varchar(30) not null,
   surnames varchar(40),
   date_of_birth date not null,
@@ -54,5 +54,3 @@ CREATE TABLE users_role (
         FOREIGN KEY (username)
             REFERENCES users(username)
 );
-
-
