@@ -1,9 +1,3 @@
-create table identification (
-  id bigint primary key generated always as identity,
-  name varchar(30) not null,
-  description varchar(40) not null
-);
-
 create table speciality (
   id bigint primary key generated always as identity,
   name varchar(40) not null

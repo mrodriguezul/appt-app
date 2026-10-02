@@ -1,11 +1,5 @@
 -- Script de inserción de datos de ejemplo para 01_create_database.sql
 
--- Tabla identification
-insert into identification (name, description) values
-('DNI', 'Documento Nacional de Identidad'),
-('Pasaporte', 'Documento de viaje internacional'),
-('Carnet de Extranjería', 'Documento para extranjeros');
-
 -- Tabla speciality
 insert into speciality (name) values
 ('Cardiología'),
