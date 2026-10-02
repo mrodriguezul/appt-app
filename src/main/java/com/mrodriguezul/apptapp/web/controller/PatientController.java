@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.web.controller;
 
 import com.mrodriguezul.apptapp.domain.model.Patient;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,14 +51,15 @@ public class PatientController {
             @Parameter(name = "sortBy", description = "Sort field", required = false, example = "id"),
             @Parameter(name = "sortDir", description = "Directorate of ordering (ASC/DESC)", required = false, example = "ASC")
     })
-    @GetMapping("/by-identification/{personIdentificationId}")
+    @GetMapping("/by-identification/{documentTypeCode}/{documentNumber}")
     public Page<Patient> getAllByIdentificationId(
-            @PathVariable Long personIdentificationId,
+            @PathVariable String documentTypeCode,
+            @PathVariable String documentNumber,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        return patientService.getAllByIdentificationId(personIdentificationId, page, size, sortBy, sortDir);
+        return patientService.getAllByDocumentTypeAndDocumentNumber(DocumentType.fromCode(documentTypeCode), documentNumber, page, size, sortBy, sortDir);
     }
 
 }

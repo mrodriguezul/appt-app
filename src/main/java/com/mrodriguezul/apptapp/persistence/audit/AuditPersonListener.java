@@ -35,13 +35,14 @@ public class AuditPersonListener {
 
         PersonEntity copy = new PersonEntity();
         copy.setId(original.getId());
-        copy.setIdentificationNumber(original.getIdentificationNumber());
+        copy.setDocumentType(original.getDocumentType());
+        copy.setDocumentNumber(original.getDocumentNumber());
         copy.setNames(original.getNames());
         copy.setSurnames(original.getSurnames());
         copy.setDateOfBirth(original.getDateOfBirth());
         copy.setEmail(original.getEmail());
         copy.setPhoneNumber(original.getPhoneNumber());
-        copy.setIdentificationEntity(original.getIdentificationEntity());
+
 
         return copy;
     }

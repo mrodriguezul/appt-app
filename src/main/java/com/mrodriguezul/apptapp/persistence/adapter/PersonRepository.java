@@ -1,5 +1,6 @@
 package com.mrodriguezul.apptapp.persistence.adapter;
 
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.persistence.crud.PersonCrudRepository;
 import com.mrodriguezul.apptapp.persistence.entity.PersonEntity;
 import org.springframework.stereotype.Repository;
@@ -13,11 +14,11 @@ public class PersonRepository {
     public PersonRepository(PersonCrudRepository personCrudRepository) {
         this.personCrudRepository = personCrudRepository;
     }
-    public List<PersonEntity> findByIdentificationIdOrderByIdentificationIdAsc(Long identificationId) {
-        return personCrudRepository.findByIdentificationEntity_IdOrderByIdentificationEntity_IdAsc(identificationId);
+    public List<PersonEntity> findByDocumentNumberOrderByDocumentNumberAsc(String documentNumber) {
+        return personCrudRepository.findByDocumentNumberOrderByDocumentNumberAsc(documentNumber);
     }
-    public PersonEntity findPersonByIdentificationIdAndIdentificationNumber(Long identificationId, String identificationNumber) {
-        return personCrudRepository.findPersonByIdentificationEntity_IdAndIdentificationNumber(identificationId, identificationNumber)
+    public PersonEntity findPersonEntitiesByDocumentTypeAndDocumentNumberOrderByDocumentNumberAsc(DocumentType documentType, String documentNumber) {
+        return personCrudRepository.findPersonEntitiesByDocumentTypeAndDocumentNumberOrderByDocumentNumberAsc(documentType, documentNumber)
                 .orElse(null);
     }
 

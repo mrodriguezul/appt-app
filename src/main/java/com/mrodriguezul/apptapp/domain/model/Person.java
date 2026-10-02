@@ -1,12 +1,14 @@
 package com.mrodriguezul.apptapp.domain.model;
 
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
+
 import java.util.Date;
 
 public abstract class Person {
 
     private Long id;
-    private Identification identification;
-    private String numeroIdentificacion;
+    private DocumentType documentType;
+    private String documentNumber;
     private String nombres;
     private String apellidos;
     private Date fechaNacimiento;
@@ -28,20 +30,20 @@ public abstract class Person {
         this.id = id;
     }
 
-    public Identification getIdentificacion() {
-        return identification;
+    public DocumentType getDocumentType() {
+        return documentType;
     }
 
-    public void setIdentificacion(Identification identification) {
-        this.identification = identification;
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
     }
 
-    public String getNumeroIdentificacion() {
-        return numeroIdentificacion;
+    public String getDocumentNumber() {
+        return documentNumber;
     }
 
-    public void setNumeroIdentificacion(String numeroIdentificacion) {
-        this.numeroIdentificacion = numeroIdentificacion;
+    public void setDocumentNumber(String documentNumber) {
+        this.documentNumber = documentNumber;
     }
 
     public String getNombres() {

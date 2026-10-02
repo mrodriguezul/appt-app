@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.domain.service;
 
 import com.mrodriguezul.apptapp.domain.model.Patient;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.persistence.adapter.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public class PatientService {
         return pacienteRepository.findAll(page, size);
     }
 
-    public Page<Patient> getAllByIdentificationId(Long personIdentificationId, int page, int size, String sortBy, String sortDir) {
-        return pacienteRepository.findAllByIdentificationId(personIdentificationId, page, size, sortBy, sortDir);
+    public Page<Patient> getAllByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber, int page, int size, String sortBy, String sortDir) {
+        return pacienteRepository.findAllByDocumentTypeAndDocumentNumber(documentType, documentNumber, page, size, sortBy, sortDir);
     }
 }
