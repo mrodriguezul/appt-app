@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.domain.service;
 
 import com.mrodriguezul.apptapp.domain.model.Doctor;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.repository.IDoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,16 @@ public class DoctorService {
         return IDoctorRepository.findAllBySpeciality(specialityId);
     }
 
-    public Optional<Doctor> getAllByIdentificationNumber(String identificationNumber){
-        return IDoctorRepository.findByIdentificationNumber(identificationNumber);
+    public Optional<Doctor> getAllByDocumentNumber(String documentNumber){
+        return IDoctorRepository.findByDocumentNumber(documentNumber);
     }
 
     public Optional<Doctor> getDoctor(Long id) {
         return IDoctorRepository.findById(id);
     }
 
-    public Optional<Doctor> getDoctorByIdentificationTypeAndIdentificationNumber(Long identificationId, String identificationNumber){
-        return IDoctorRepository.findByIdentificationTypeAndIdentificationNumber(identificationId, identificationNumber);
+    public Optional<Doctor> getDoctorByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber){
+        return IDoctorRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
     }
 
     public Doctor save(Doctor doctor) {

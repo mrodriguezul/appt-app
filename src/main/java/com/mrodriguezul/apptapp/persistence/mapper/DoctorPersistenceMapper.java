@@ -4,12 +4,12 @@ import com.mrodriguezul.apptapp.domain.model.Doctor;
 import com.mrodriguezul.apptapp.persistence.entity.DoctorEntity;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {PersonPersistenceMapper.class, IdentificationPersistenceMapper.class, SpecialityPersistenceMapper.class})
+@Mapper(componentModel = "spring", uses = {PersonPersistenceMapper.class, SpecialityPersistenceMapper.class})
 public interface DoctorPersistenceMapper {
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "personEntity.identificationEntity", target = "identificacion"),
-        @Mapping(source = "personEntity.identificationNumber", target = "numeroIdentificacion"),
+        @Mapping(source = "personEntity.documentType", target = "documentType"),
+        @Mapping(source = "personEntity.documentNumber", target = "documentNumber"),
         @Mapping(source = "personEntity.names", target = "nombres"),
         @Mapping(source = "personEntity.surnames", target = "apellidos"),
         @Mapping(source = "personEntity.dateOfBirth", target = "fechaNacimiento"),

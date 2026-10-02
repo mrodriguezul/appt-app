@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.persistence.adapter;
 
 import com.mrodriguezul.apptapp.domain.model.Patient;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.repository.IPatientRepository;
 import com.mrodriguezul.apptapp.persistence.crud.PatientPagSortRepository;
 import com.mrodriguezul.apptapp.persistence.mapper.PatientPersistenceMapper;
@@ -31,10 +32,10 @@ public class PatientRepository implements IPatientRepository {
     }
 
     @Override
-    public Page<Patient> findAllByIdentificationId(Long personIdentificationId, int page, int size, String sortBy, String sortDir) {
+    public Page<Patient> findAllByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber, int page, int size, String sortBy, String sortDir) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return patientPagSortRepository.findAllByPersonEntity_IdentificationEntityId(personIdentificationId, pageable).map(patientPersistenceMapper::toPaciente);
+        return patientPagSortRepository.findAllByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumberOrderByIdAsc(documentType, documentNumber, pageable).map(patientPersistenceMapper::toPaciente);
     }
 }

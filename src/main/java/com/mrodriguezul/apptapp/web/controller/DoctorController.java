@@ -2,6 +2,7 @@ package com.mrodriguezul.apptapp.web.controller;
 
 
 import com.mrodriguezul.apptapp.domain.model.Doctor;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -96,7 +97,7 @@ public class DoctorController {
     })
     @GetMapping("/identification/{identificationNumber}")
     public ResponseEntity<Doctor> getDoctorByIdentificationNumber(@PathVariable String identificationNumber) {
-        return doctorService.getAllByIdentificationNumber(identificationNumber)
+        return doctorService.getAllByDocumentNumber(identificationNumber)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -107,14 +108,14 @@ public class DoctorController {
             @ApiResponse(responseCode = "404", description = "Doctor not found")
     })
     @Parameters(value = {
-            @Parameter(name = "identificationId", description = "ID of the identification type", required = true, example = "1"),
-            @Parameter(name = "identificationNumber", description = "Doctor's identification number", required = true, example = "12345678")
+            @Parameter(name = "documentTypeCode", description = "Code of the identification type", required = true, example = "01"),
+            @Parameter(name = "documentNumber", description = "Doctor's identification number", required = true, example = "12345678")
     })
-    @GetMapping("/identification/{identificationId}/{identificationNumber}")
+    @GetMapping("/identification/{documentTypeCode}/{documentNumber}")
     public ResponseEntity<Doctor> getDoctorByIdentificationTypeAndNumber(
-            @PathVariable Long identificationId,
-            @PathVariable String identificationNumber) {
-        return doctorService.getDoctorByIdentificationTypeAndIdentificationNumber(identificationId, identificationNumber)
+            @PathVariable String documentTypeCode,
+            @PathVariable String documentNumber) {
+        return doctorService.getDoctorByDocumentTypeAndDocumentNumber(DocumentType.fromCode(documentTypeCode), documentNumber)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

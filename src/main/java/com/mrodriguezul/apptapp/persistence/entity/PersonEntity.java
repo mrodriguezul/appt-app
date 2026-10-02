@@ -1,7 +1,9 @@
 package com.mrodriguezul.apptapp.persistence.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mrodriguezul.apptapp.persistence.audit.AuditEntity;
 import com.mrodriguezul.apptapp.persistence.audit.AuditPersonListener;
+import com.mrodriguezul.apptapp.persistence.converter.DocumentTypeSerializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.*;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 
 @Entity
 @Getter
@@ -21,8 +24,11 @@ public class PersonEntity extends AuditEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "identification_number", nullable = false, length = 20)
-    private String identificationNumber;
+    @Column(name = "document_type_code", nullable = false, length = 2)
+    private DocumentType documentType;
+
+    @Column(name = "document_number", nullable = false, length = 20)
+    private String documentNumber;
 
     @Column(nullable = false, length = 30)
     private String names;
@@ -39,10 +45,6 @@ public class PersonEntity extends AuditEntity implements Serializable {
     @Column(length = 15)
     private String phoneNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "identification_id", nullable = false)
-    private IdentificationEntity identificationEntity;
-
     @OneToOne(mappedBy = "personEntity")
     private DoctorEntity doctorEntity;
 
@@ -53,13 +55,13 @@ public class PersonEntity extends AuditEntity implements Serializable {
     public String toString() {
         return "PersonEntity{" +
                 "id=" + id +
-                ", identificationNumber='" + identificationNumber + '\'' +
+                ", documentType='" + documentType + '\'' +
+                ", documentNumber='" + documentNumber + '\'' +
                 ", names='" + names + '\'' +
                 ", surnames='" + surnames + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", identificationEntity=" + (identificationEntity != null ? identificationEntity.getId() : null) +
                 '}';
     }
 }

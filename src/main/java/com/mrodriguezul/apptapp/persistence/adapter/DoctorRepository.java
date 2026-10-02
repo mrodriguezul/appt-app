@@ -1,6 +1,7 @@
 package com.mrodriguezul.apptapp.persistence.adapter;
 
 import com.mrodriguezul.apptapp.domain.model.Doctor;
+import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.repository.IDoctorRepository;
 import com.mrodriguezul.apptapp.persistence.crud.DoctorCrudRepository;
 import com.mrodriguezul.apptapp.persistence.crud.PersonCrudRepository;
@@ -50,8 +51,8 @@ public class DoctorRepository implements IDoctorRepository {
     }
 
     @Override
-    public Optional<Doctor> findByIdentificationNumber(String identificationNumber) {
-        return doctorCrudRepository.findByPersonEntity_IdentificationNumberOrderByIdAsc(identificationNumber)
+    public Optional<Doctor> findByDocumentNumber(String documentNumber) {
+        return doctorCrudRepository.findByPersonEntity_DocumentNumberOrderByIdAsc(documentNumber)
                 .map(mapper::toDoctor);
     }
 
@@ -63,8 +64,8 @@ public class DoctorRepository implements IDoctorRepository {
     }
 
     @Override
-    public Optional<Doctor> findByIdentificationTypeAndIdentificationNumber(Long identificationId, String identificationNumber) {
-        return doctorCrudRepository.findByPersonEntity_IdentificationEntityIdAndPersonEntity_IdentificationNumber(identificationId, identificationNumber)
+    public Optional<Doctor> findByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber) {
+        return doctorCrudRepository.findByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumberOrderByIdAsc(documentType, documentNumber)
                 .map(mapper::toDoctor);
     }
 
@@ -89,28 +90,5 @@ public class DoctorRepository implements IDoctorRepository {
     public boolean existsById(Long id) {
         return doctorCrudRepository.existsById(id);
     }
-
-
-    /*public DoctorRepository(DoctorCrudRepository doctorCrudRepository) {
-        this.doctorCrudRepository = doctorCrudRepository;
-    }
-
-    List<DoctorEntity> findBySpecialityIdOrderBySpecialityId(Long id) {
-        return doctorCrudRepository.findBySpeciality_IdOrderBySpeciality_Id(id);
-    }
-
-    DoctorEntity findByPersonId(Long personId) {
-        return doctorCrudRepository.findByPerson_Id(personId).orElse(null);
-    }
-
-    DoctorEntity findByPersonIdAndPersonIdentificationNumber(Long personId, String identificationNumber) {
-        return doctorCrudRepository.findByPerson_IdAndPerson_IdentificationNumber(personId, identificationNumber)
-                .orElse(null);
-    }
-
-    DoctorEntity findByPersonIdentificationIdAndPersonIdentificationNumber(Long identificationId, String identificationNumber) {
-        return doctorCrudRepository.findByPerson_IdentificationIdAndPerson_IdentificationNumber(identificationId, identificationNumber)
-                .orElse(null);
-    }*/
 
 }
