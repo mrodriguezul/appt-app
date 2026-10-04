@@ -41,8 +41,8 @@ public interface UserPersistenceMapper {
             return null;
         }
         Role role = new Role();
-        role.setNombre(roleEntity.getRole());
-        role.setFechaAsignacion(roleEntity.getGrantedDate());
+        role.setName(roleEntity.getRole());
+        role.setGrantedDate(roleEntity.getGrantedDate());
         return role;
     }
 }

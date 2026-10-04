@@ -2,11 +2,11 @@ package com.mrodriguezul.apptapp.domain.model;
 
 public class Speciality {
     private Long id;
-    private String nombre;
+    private String name;
 
-    public Speciality(Long id, String nombre) {
+    public Speciality(Long id, String name) {
         this.id = id;
-        this.nombre = nombre;
+        this.name = name;
     }
 
     public Speciality() {
@@ -20,11 +20,11 @@ public class Speciality {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 }

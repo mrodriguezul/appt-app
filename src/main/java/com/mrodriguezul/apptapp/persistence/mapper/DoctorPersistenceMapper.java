@@ -10,11 +10,11 @@ public interface DoctorPersistenceMapper {
         @Mapping(source = "id", target = "id"),
         @Mapping(source = "personEntity.documentType", target = "documentType"),
         @Mapping(source = "personEntity.documentNumber", target = "documentNumber"),
-        @Mapping(source = "personEntity.names", target = "nombres"),
-        @Mapping(source = "personEntity.surnames", target = "apellidos"),
-        @Mapping(source = "personEntity.dateOfBirth", target = "fechaNacimiento"),
+        @Mapping(source = "personEntity.names", target = "names"),
+        @Mapping(source = "personEntity.surnames", target = "surnames"),
+        @Mapping(source = "personEntity.dateOfBirth", target = "dateOfBirth"),
         @Mapping(source = "personEntity.email", target = "email"),
-        @Mapping(source = "personEntity.phoneNumber", target = "numeroTelefono"),
+        @Mapping(source = "personEntity.phoneNumber", target = "phoneNumber"),
         @Mapping(source = "specialityEntity", target = "especialidad")
     })
     Doctor toDoctor(DoctorEntity doctorEntity);
