@@ -10,13 +10,13 @@ import org.mapstruct.Mappings;
 public interface SpecialityPersistenceMapper {
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "name", target = "nombre")
+        @Mapping(source = "name", target = "name")
     })
     Speciality toEspecialidad(SpecialityEntity specialityEntity);
 
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "nombre", target = "name")
+        @Mapping(source = "name", target = "name")
     })
     SpecialityEntity toSpecialityEntity(Speciality speciality);
 }

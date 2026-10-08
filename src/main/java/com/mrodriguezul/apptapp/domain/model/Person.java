@@ -9,11 +9,11 @@ public abstract class Person {
     private Long id;
     private DocumentType documentType;
     private String documentNumber;
-    private String nombres;
-    private String apellidos;
-    private Date fechaNacimiento;
+    private String names;
+    private String surnames;
+    private Date dateOfBirth;
     private String email;
-    private String numeroTelefono;
+    private String phoneNumber;
 
     public Person(Long id) {
         this.id = id;
@@ -46,28 +46,28 @@ public abstract class Person {
         this.documentNumber = documentNumber;
     }
 
-    public String getNombres() {
-        return nombres;
+    public String getNames() {
+        return names;
     }
 
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
+    public void setNames(String names) {
+        this.names = names;
     }
 
-    public String getApellidos() {
-        return apellidos;
+    public String getSurnames() {
+        return surnames;
     }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
+    public void setSurnames(String surnames) {
+        this.surnames = surnames;
     }
 
-    public Date getFechaNacimiento() {
-        return fechaNacimiento;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setFechaNacimiento(Date fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getEmail() {
@@ -78,11 +78,11 @@ public abstract class Person {
         this.email = email;
     }
 
-    public String getNumeroTelefono() {
-        return numeroTelefono;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setNumeroTelefono(String numeroTelefono) {
-        this.numeroTelefono = numeroTelefono;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

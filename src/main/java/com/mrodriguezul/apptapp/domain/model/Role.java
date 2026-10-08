@@ -3,38 +3,38 @@ package com.mrodriguezul.apptapp.domain.model;
 import java.time.LocalDateTime;
 
 public class Role {
-    private String nombre;
-    private LocalDateTime fechaAsignacion;
+    private String name;
+    private LocalDateTime grantedDate;
 
     public Role() {
     }
 
-    public Role(String nombre, LocalDateTime fechaAsignacion) {
-        this.nombre = nombre;
-        this.fechaAsignacion = fechaAsignacion;
+    public Role(String name, LocalDateTime grantedDate) {
+        this.name = name;
+        this.grantedDate = grantedDate;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public LocalDateTime getFechaAsignacion() {
-        return fechaAsignacion;
+    public LocalDateTime getGrantedDate() {
+        return grantedDate;
     }
 
-    public void setFechaAsignacion(LocalDateTime fechaAsignacion) {
-        this.fechaAsignacion = fechaAsignacion;
+    public void setGrantedDate(LocalDateTime grantedDate) {
+        this.grantedDate = grantedDate;
     }
 
     @Override
     public String toString() {
         return "Role{" +
-                "nombre='" + nombre + '\'' +
-                ", fechaAsignacion=" + fechaAsignacion +
+                "name='" + name + '\'' +
+                ", grantedDate=" + grantedDate +
                 '}';
     }
 }

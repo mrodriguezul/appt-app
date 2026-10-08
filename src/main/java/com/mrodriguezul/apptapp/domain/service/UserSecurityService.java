@@ -53,7 +53,7 @@ public class UserSecurityService implements UserDetailsService {
 
         String[] roles = user.getRoles() != null && !user.getRoles().isEmpty() ?
                 user.getRoles().stream()
-                        .map(rol -> rol.getNombre())
+                        .map(rol -> rol.getName())
                         .toArray(String[]::new) :
                 new String[]{"NO-ROL"};
 
