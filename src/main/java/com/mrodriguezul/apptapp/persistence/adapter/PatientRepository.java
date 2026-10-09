@@ -3,6 +3,7 @@ package com.mrodriguezul.apptapp.persistence.adapter;
 import com.mrodriguezul.apptapp.domain.model.Patient;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.repository.IPatientRepository;
+import com.mrodriguezul.apptapp.persistence.crud.PatientCrudRepository;
 import com.mrodriguezul.apptapp.persistence.crud.PatientPagSortRepository;
 import com.mrodriguezul.apptapp.persistence.mapper.PatientPersistenceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,16 @@ import org.springframework.stereotype.Repository;
 public class PatientRepository implements IPatientRepository {
 
     private final PatientPagSortRepository patientPagSortRepository;
+    private final PatientCrudRepository patientCrudRepository;
     private final PatientPersistenceMapper patientPersistenceMapper;
 
     @Autowired
-    public PatientRepository(PatientPagSortRepository patientPagSortRepository, PatientPersistenceMapper patientPersistenceMapper) {
+    public PatientRepository(
+            PatientPagSortRepository patientPagSortRepository,
+            PatientCrudRepository patientCrudRepository,
+            PatientPersistenceMapper patientPersistenceMapper) {
         this.patientPagSortRepository = patientPagSortRepository;
+        this.patientCrudRepository = patientCrudRepository;
         this.patientPersistenceMapper = patientPersistenceMapper;
     }
 
@@ -37,5 +43,10 @@ public class PatientRepository implements IPatientRepository {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return patientPagSortRepository.findAllByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumberOrderByIdAsc(documentType, documentNumber, pageable).map(patientPersistenceMapper::toPaciente);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return patientCrudRepository.existsById(id);
     }
 }

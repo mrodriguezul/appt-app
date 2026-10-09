@@ -31,6 +31,8 @@ create table appointment (
   reason text not null
 );
 
+CREATE UNIQUE INDEX appointment_doctor_id_idx ON public.appointment (doctor_id,appointment_date);
+
 create table users (
     username varchar(30)  not null primary key,
     password varchar(100) not null,
