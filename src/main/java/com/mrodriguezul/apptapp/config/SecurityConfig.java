@@ -33,7 +33,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/doctor").hasAuthority("VIEW_DOCTORS_ALL")
                     .requestMatchers(HttpMethod.GET, "/doctor/specialty/**").hasAuthority("VIEW_DOCTORS_BY_SPECIALTIES")
                     .requestMatchers(HttpMethod.GET, "/doctor/**").hasAnyRole("ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/paciente/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/patient/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.POST, "/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/**").denyAll()

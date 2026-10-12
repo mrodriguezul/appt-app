@@ -43,11 +43,16 @@ public class PatientRepository implements IPatientRepository {
     }
 
     @Override
-    public Page<Patient> findAllByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber, int page, int size, String sortBy, String sortDir) {
+    public Optional<Patient> findByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber) {
+        return patientCrudRepository.findByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumber(documentType, documentNumber).map(patientPersistenceMapper::toModel);
+    }
+
+    @Override
+    public Page<Patient> findAllByNameOrSurname(String names, String surnames, int page, int size, String sortBy, String sortDir) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return patientCrudRepository.findAllByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumberOrderByIdAsc(documentType, documentNumber, pageable).map(patientPersistenceMapper::toModel);
+        return patientCrudRepository.findAllByPersonEntity_NamesContainingIgnoreCaseAndPersonEntity_SurnamesContainingIgnoreCaseOrderByIdAsc(names, surnames, pageable).map(patientPersistenceMapper::toModel);
     }
 
     @Override
@@ -58,11 +63,6 @@ public class PatientRepository implements IPatientRepository {
     @Override
     public Optional<Patient> findById(Long id) {
         return patientCrudRepository.findById(id).map(patientPersistenceMapper::toModel);
-    }
-
-    @Override
-    public Optional<Patient> findByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber) {
-        return patientCrudRepository.findByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumber(documentType, documentNumber).map(patientPersistenceMapper::toModel);
     }
 
     @Override

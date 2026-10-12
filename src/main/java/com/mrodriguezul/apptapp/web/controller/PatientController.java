@@ -22,12 +22,11 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Patient", description = "Operations - patients 👴🧓")
 @RestController
-@RequestMapping("/paciente")
+@RequestMapping("/patient")
 public class PatientController {
     private final PatientService patientService;
     private final PatientWebMapper patientWebMapper;
 
-    @Autowired
     public PatientController(PatientService patientService, PatientWebMapper patientWebMapper) {
         this.patientService = patientService;
         this.patientWebMapper = patientWebMapper;
@@ -39,12 +38,12 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "No patients were found")
     })
     @Parameters(value = {
-            @Parameter(name = "page", description = "Page number", required = false, example = "0"),
-            @Parameter(name = "size", description = "Number of page elements", required = false, example = "10")
+            @Parameter(name = "page", description = "Page number", example = "0"),
+            @Parameter(name = "size", description = "Number of page elements", example = "10")
     })
     @GetMapping
-    public Page<Patient> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return patientService.getAll(page, size);
+    public Page<PatientResponseDto> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return patientService.getAll(page, size).map(patientWebMapper::toResponse);
     }
 
     @Operation(summary = "Obtain patients by identification", description = "Returns a paginated list of patients filtered by ID")
@@ -54,20 +53,27 @@ public class PatientController {
     })
     @Parameters(value = {
             @Parameter(name = "personIdentificationId", description = "ID de la identificación de la persona", required = true, example = "1", in = ParameterIn.PATH),
-            @Parameter(name = "page", description = "Page number", required = false, example = "0"),
-            @Parameter(name = "size", description = "Number of page elements", required = false, example = "10"),
-            @Parameter(name = "sortBy", description = "Sort field", required = false, example = "id"),
-            @Parameter(name = "sortDir", description = "Directorate of ordering (ASC/DESC)", required = false, example = "ASC")
+            @Parameter(name = "page", description = "Page number", example = "0"),
+            @Parameter(name = "size", description = "Number of page elements", example = "10"),
+            @Parameter(name = "sortBy", description = "Sort field", example = "id"),
+            @Parameter(name = "sortDir", description = "Directorate of ordering (ASC/DESC)", example = "ASC")
     })
-    @GetMapping("/by-identification/{documentTypeCode}/{documentNumber}")
-    public Page<Patient> getAllByIdentificationId(
-            @PathVariable String documentTypeCode,
-            @PathVariable String documentNumber,
+    @GetMapping("/search")
+    public Page<PatientResponseDto> getAllBySearchNamesOrSurnames(
+            @RequestParam(defaultValue = "") String names,
+            @RequestParam(defaultValue = "") String surnames,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
-        return patientService.getAllByDocumentTypeAndDocumentNumber(DocumentType.fromCode(documentTypeCode), documentNumber, page, size, sortBy, sortDir);
+        return patientService.getAllByNameOrSurname(names, surnames, page, size, sortBy, sortDir).map(patientWebMapper::toResponse);
+    }
+
+    @GetMapping("/by-identification/{documentTypeCode}/{documentNumber}")
+    public ResponseEntity<PatientResponseDto> getPatientByIdentification(
+            @PathVariable String documentTypeCode,
+            @PathVariable String documentNumber) {
+        return ResponseEntity.ok(patientWebMapper.toResponse(patientService.getByDocumentTypeAndDocumentNumber(DocumentType.fromCode(documentTypeCode), documentNumber)));
     }
 
     @PostMapping

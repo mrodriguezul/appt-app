@@ -24,8 +24,15 @@ public class PatientService {
         return patientRepository.findAll(page, size);
     }
 
-    public Page<Patient> getAllByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber, int page, int size, String sortBy, String sortDir) {
-        return patientRepository.findAllByDocumentTypeAndDocumentNumber(documentType, documentNumber, page, size, sortBy, sortDir);
+    public Page<Patient> getAllByNameOrSurname(String names, String surnames, int page, int size, String sortBy, String sortDir) {
+        return patientRepository.findAllByNameOrSurname(names, surnames, page, size, sortBy, sortDir);
+    }
+
+    public Patient getByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber) {
+        return patientRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Patient not found")
+                );
     }
 
     @Transactional

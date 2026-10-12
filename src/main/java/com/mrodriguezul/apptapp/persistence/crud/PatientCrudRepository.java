@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PatientCrudRepository extends JpaRepository<PatientEntity, Long> {
-    Page<PatientEntity> findAllByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumberOrderByIdAsc(DocumentType documentType, String documentNumber, Pageable pageable);
+    Page<PatientEntity> findAllByPersonEntity_NamesContainingIgnoreCaseAndPersonEntity_SurnamesContainingIgnoreCaseOrderByIdAsc(String names, String surnames, Pageable pageable);
     Optional<PatientEntity> findByPersonEntity_DocumentTypeAndPersonEntity_DocumentNumber(DocumentType documentType, String documentNumber);
     @EntityGraph(attributePaths = "personEntity")
     Optional<PatientEntity> findById(Long id);

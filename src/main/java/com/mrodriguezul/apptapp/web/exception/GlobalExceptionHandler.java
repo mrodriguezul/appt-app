@@ -22,17 +22,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidAppointmentException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidAppointment(InvalidAppointmentException ex) {
-        return errorResponse("Datos inválidos", ex.getMessage(), 400);
+        return errorResponse("Invalid data", ex.getMessage(), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
-        return errorResponse("Recurso no encontrado", ex.getMessage(), 404);
+        return errorResponse("Resource not found", ex.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
     @ExceptionHandler(AppointmentConflictException.class)
     public ResponseEntity<Map<String, Object>> handleAppointmentConflict(AppointmentConflictException ex) {
-        return errorResponse("Conflicto de horario", ex.getMessage(), 409);
+        return errorResponse("Schedule conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
     }
 
     @ExceptionHandler(Exception.class)
