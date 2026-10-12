@@ -3,6 +3,9 @@ package com.mrodriguezul.apptapp.web.controller;
 import com.mrodriguezul.apptapp.domain.model.Patient;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.domain.service.PatientService;
+import com.mrodriguezul.apptapp.web.dto.PatientRequestDto;
+import com.mrodriguezul.apptapp.web.dto.PatientResponseDto;
+import com.mrodriguezul.apptapp.web.mapper.PatientWebMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -10,8 +13,11 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Patient", description = "Operations - patients 👴🧓")
@@ -19,10 +25,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/paciente")
 public class PatientController {
     private final PatientService patientService;
+    private final PatientWebMapper patientWebMapper;
 
     @Autowired
-    public PatientController(PatientService patientService) {
+    public PatientController(PatientService patientService, PatientWebMapper patientWebMapper) {
         this.patientService = patientService;
+        this.patientWebMapper = patientWebMapper;
     }
 
     @Operation(summary = "Get all patients", description = "Returns a paginated list of patients")
@@ -60,6 +68,20 @@ public class PatientController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDir) {
         return patientService.getAllByDocumentTypeAndDocumentNumber(DocumentType.fromCode(documentTypeCode), documentNumber, page, size, sortBy, sortDir);
+    }
+
+    @PostMapping
+    public ResponseEntity<PatientResponseDto> create(@Valid @RequestBody PatientRequestDto request) {
+        Patient patient = patientService.create( patientWebMapper.toModel(request));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(patientWebMapper.toResponse(patient));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PatientResponseDto> update(@PathVariable Long id, @Valid @RequestBody PatientRequestDto request) {
+        Patient patient = patientService.update(id, patientWebMapper.toModel(request));
+        return ResponseEntity.ok(patientWebMapper.toResponse(patient));
     }
 
 }
