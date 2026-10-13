@@ -1,85 +1,96 @@
 package com.mrodriguezul.apptapp.web.exception;
 
+import com.mrodriguezul.apptapp.domain.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(InvalidAppointmentException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidAppointment(InvalidAppointmentException ex) {
+        return errorResponse("Invalid data", ex.getMessage(), HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return errorResponse("Resource not found", ex.getMessage(), HttpStatus.NOT_FOUND.value());
+    }
+
+    @ExceptionHandler(AppointmentConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleAppointmentConflict(AppointmentConflictException ex) {
+        return errorResponse("Schedule conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         logger.error("Error interno del servidor: ", ex);
-
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Error interno del servidor");
-        errorResponse.put("message", "Ha ocurrido un error inesperado. Por favor, inténtelo más tarde.");
-        errorResponse.put("status", 500);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse("Internal Server Error", "An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<Map<String, Object>> handleDataAccessException(DataAccessException ex) {
         logger.error("Error de acceso a datos: ", ex);
-
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Error de base de datos");
-        errorResponse.put("message", "Error al acceder a los datos. Por favor, inténtelo más tarde.");
-        errorResponse.put("status", 500);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse("Data Access Error", "Database access error", HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
         logger.warn("Error de validación: ", ex);
+        return errorResponse("Invalid data error", "The provided data is not valid", HttpStatus.BAD_REQUEST.value());
+    }
 
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Datos inválidos");
-        errorResponse.put("message", "Los datos proporcionados no son válidos");
-        errorResponse.put("status", 400);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logger.warn("Error illegal argument: ", ex);
+        return errorResponse("Error Illegal Argument", "The provided data is not valid", HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         logger.warn("Error de tipo de parámetro: ", ex);
-
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Parámetro inválido");
-        errorResponse.put("message", "El parámetro proporcionado no tiene el formato correcto");
-        errorResponse.put("status", 400);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return errorResponse("Invalid parameter error", "The provided parameter is not in the correct format", HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         logger.error("Error de tiempo de ejecución: ", ex);
-
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Error de procesamiento");
-        errorResponse.put("message", ex.getMessage() != null ? ex.getMessage() : "Error durante el procesamiento de la solicitud");
-        errorResponse.put("status", 500);
-        errorResponse.put("timestamp", System.currentTimeMillis());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return errorResponse("Procesing error", "An unexpected error occurred during request processing", HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidJson(HttpMessageNotReadableException ex) {
+        logger.error("Error json bad request: ", ex);
+        return errorResponse("Invalid request body", "The request body is invalid or malformed", HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler({ PatientAlreadyExistsException.class, PersonDataConflictException.class })
+    public ResponseEntity<Map<String, Object>> handlePatientConflict(RuntimeException ex) {
+        logger.error("Error Data conflict: ", ex);
+        return errorResponse("Conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
+    }
+
+    private ResponseEntity<Map<String, Object>> errorResponse(String error, String message, int status) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", error);
+        errorResponse.put("message", message);
+        errorResponse.put("status", status);
+        errorResponse.put("timestamp", System.currentTimeMillis());
+        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(status));
+    }
+
+
 }

@@ -1,25 +1,22 @@
 package com.mrodriguezul.apptapp.persistence.adapter;
 
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
+import com.mrodriguezul.apptapp.domain.repository.IPersonRepository;
 import com.mrodriguezul.apptapp.persistence.crud.PersonCrudRepository;
-import com.mrodriguezul.apptapp.persistence.entity.PersonEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public class PersonRepository {
-    private PersonCrudRepository personCrudRepository;
+public class PersonRepository implements IPersonRepository {
+    private final PersonCrudRepository personCrudRepository;
 
+    @Autowired
     public PersonRepository(PersonCrudRepository personCrudRepository) {
         this.personCrudRepository = personCrudRepository;
     }
-    public List<PersonEntity> findByDocumentNumberOrderByDocumentNumberAsc(String documentNumber) {
-        return personCrudRepository.findByDocumentNumberOrderByDocumentNumberAsc(documentNumber);
-    }
-    public PersonEntity findPersonEntitiesByDocumentTypeAndDocumentNumberOrderByDocumentNumberAsc(DocumentType documentType, String documentNumber) {
-        return personCrudRepository.findPersonEntitiesByDocumentTypeAndDocumentNumberOrderByDocumentNumberAsc(documentType, documentNumber)
-                .orElse(null);
-    }
 
+    @Override
+    public boolean existsByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber) {
+        return personCrudRepository.existsByDocumentTypeAndDocumentNumber(documentType, documentNumber);
+    }
 }

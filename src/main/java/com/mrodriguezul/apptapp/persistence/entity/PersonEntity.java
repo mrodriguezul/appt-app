@@ -1,16 +1,14 @@
 package com.mrodriguezul.apptapp.persistence.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mrodriguezul.apptapp.persistence.audit.AuditEntity;
 import com.mrodriguezul.apptapp.persistence.audit.AuditPersonListener;
-import com.mrodriguezul.apptapp.persistence.converter.DocumentTypeSerializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDate;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 
 @Entity
@@ -37,7 +35,7 @@ public class PersonEntity extends AuditEntity implements Serializable {
     private String surnames;
 
     @Column(name = "date_of_birth", nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(length = 30)
     private String email;
