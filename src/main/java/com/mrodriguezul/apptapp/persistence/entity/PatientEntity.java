@@ -17,6 +17,9 @@ public class PatientEntity implements Serializable {
     @Id
     private Long id;
 
+    @Column(name = "medical_record_number", nullable = false, length = 20)
+    private String medicalRecordNumber;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "id", nullable = false)

@@ -1,8 +1,6 @@
 package com.mrodriguezul.apptapp.web.exception;
 
-import com.mrodriguezul.apptapp.domain.exception.AppointmentConflictException;
-import com.mrodriguezul.apptapp.domain.exception.InvalidAppointmentException;
-import com.mrodriguezul.apptapp.domain.exception.ResourceNotFoundException;
+import com.mrodriguezul.apptapp.domain.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -24,17 +22,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidAppointmentException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidAppointment(InvalidAppointmentException ex) {
-        return errorResponse("Datos inválidos", ex.getMessage(), 400);
+        return errorResponse("Invalid data", ex.getMessage(), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
-        return errorResponse("Recurso no encontrado", ex.getMessage(), 404);
+        return errorResponse("Resource not found", ex.getMessage(), HttpStatus.NOT_FOUND.value());
     }
 
     @ExceptionHandler(AppointmentConflictException.class)
     public ResponseEntity<Map<String, Object>> handleAppointmentConflict(AppointmentConflictException ex) {
-        return errorResponse("Conflicto de horario", ex.getMessage(), 409);
+        return errorResponse("Schedule conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
     }
 
     @ExceptionHandler(Exception.class)
@@ -55,6 +53,12 @@ public class GlobalExceptionHandler {
         return errorResponse("Invalid data error", "The provided data is not valid", HttpStatus.BAD_REQUEST.value());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logger.warn("Error illegal argument: ", ex);
+        return errorResponse("Error Illegal Argument", "The provided data is not valid", HttpStatus.BAD_REQUEST.value());
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         logger.warn("Error de tipo de parámetro: ", ex);
@@ -69,8 +73,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidJson(HttpMessageNotReadableException ex) {
-        logger.error("Error jsonbad request: ", ex);
+        logger.error("Error json bad request: ", ex);
         return errorResponse("Invalid request body", "The request body is invalid or malformed", HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ExceptionHandler({ PatientAlreadyExistsException.class, PersonDataConflictException.class })
+    public ResponseEntity<Map<String, Object>> handlePatientConflict(RuntimeException ex) {
+        logger.error("Error Data conflict: ", ex);
+        return errorResponse("Conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
     }
 
     private ResponseEntity<Map<String, Object>> errorResponse(String error, String message, int status) {

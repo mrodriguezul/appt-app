@@ -6,7 +6,7 @@ create table speciality (
 create table person (
   id bigint primary key generated always as identity,
   document_type_code varchar(2) not null,
-  document_number varchar(20) not null unique,
+  document_number varchar(20) not null,
   names varchar(30) not null,
   surnames varchar(40),
   date_of_birth date not null,
@@ -14,13 +14,16 @@ create table person (
   phone_number varchar(15)
 );
 
+CREATE UNIQUE INDEX person_document_type_code_idx ON public.person (document_type_code,document_number);
+
 create table doctor (
   id bigint primary key references person (id),
   speciality_id bigint not null references speciality (id)
 );
 
 create table patient (
-  id bigint primary key references person (id)
+  id bigint primary key references person (id),
+  medical_record_number varchar(20) not null
 );
 
 create table appointment (
