@@ -1,5 +1,6 @@
 package com.mrodriguezul.apptapp.web.controller;
 
+import com.mrodriguezul.apptapp.domain.model.AuthenticationResult;
 import com.mrodriguezul.apptapp.domain.service.UserSecurityService;
 import com.mrodriguezul.apptapp.web.dto.LoginRequestDto;
 import com.mrodriguezul.apptapp.web.dto.LoginResponseDto;
@@ -19,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
-        String token = userSecurityService.loginUser(request.username(), request.password());
-        return ResponseEntity.ok(new LoginResponseDto(token, "Bearer", 3600));
+        AuthenticationResult authResult = userSecurityService.loginUser(request.username(), request.password());
+        return ResponseEntity.ok(new LoginResponseDto(authResult.token(), "Bearer", authResult.expiresIn()));
     }
 }
