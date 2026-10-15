@@ -1,57 +1,67 @@
 package com.mrodriguezul.apptapp.config;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtConfig jwtConfig;
     private final UserDetailsService userDetailsService;
 
-    @Autowired
     public JwtFilter(JwtConfig jwtConfig, UserDetailsService userDetailsService) {
         this.jwtConfig = jwtConfig;
         this.userDetailsService = userDetailsService;
     }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // Step 1: Get the Authorization header from the request
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Bearer")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        // Step 2: Extract the JWT token from the header
-        String jwt = authHeader.split(" ")[1].trim();
 
-        if (!this.jwtConfig.isValid(jwt)) {
+        String jwt = authHeader.substring("Bearer ".length()).trim();
+        if (jwt.isEmpty() || jwt.chars().anyMatch(Character::isWhitespace) || !jwtConfig.isValid(jwt)) {
+            SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
             return;
         }
-        // Step 3: Get the username from the token and load user details
-        String username = this.jwtConfig.getUsername(jwt);
-        User user = (User) this.userDetailsService.loadUserByUsername(username);
 
-        // Step 4: Create an authentication token
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
+        try {
+            DecodedJWT decodedJWT = jwtConfig.verify(jwt);
+            String username = decodedJWT.getSubject();
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (!userDetails.isAccountNonLocked() || !userDetails.isEnabled()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        System.out.println(authenticationToken);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
+            SecurityContextHolder.setContext(context);
+        } catch (UsernameNotFoundException | JWTVerificationException ex) {
+            SecurityContextHolder.clearContext();
+        }
         filterChain.doFilter(request, response);
     }
 }
