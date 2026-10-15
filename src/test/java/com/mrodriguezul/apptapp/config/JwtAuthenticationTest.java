@@ -2,6 +2,7 @@ package com.mrodriguezul.apptapp.config;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.mrodriguezul.apptapp.domain.model.AuthenticationResult;
 import com.mrodriguezul.apptapp.domain.service.UserSecurityService;
 import com.mrodriguezul.apptapp.persistence.adapter.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -24,6 +25,11 @@ import static org.mockito.Mockito.*;
 
 class JwtAuthenticationTest {
     private static final String SECRET = "01234567890123456789012345678901";
+    private static final String ISSUER = "mrodriguezul.com";
+
+    private JwtConfig jwtConfig() {
+        return new JwtConfig(new JwtProperties(SECRET, ISSUER, 60));
+    }
 
     @AfterEach
     void clearSecurityContext() {
@@ -38,11 +44,12 @@ class JwtAuthenticationTest {
         when(manager.authenticate(any())).thenReturn(
                 new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
 
-        UserSecurityService service = new UserSecurityService(manager, new JwtConfig(SECRET), mock(UserRepository.class));
+        UserSecurityService service = new UserSecurityService(manager, jwtConfig(), mock(UserRepository.class));
 
-        String token = service.loginUser("alice", "password");
+        AuthenticationResult authResult = service.loginUser("alice", "password");
+        String token = authResult.token();
 
-        assertEquals("alice", new JwtConfig(SECRET).getUsername(token));
+        assertEquals("alice", jwtConfig().getUsername(token));
         verify(manager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
@@ -50,15 +57,15 @@ class JwtAuthenticationTest {
     void rejectsIncorrectCredentials() {
         AuthenticationManager manager = mock(AuthenticationManager.class);
         when(manager.authenticate(any())).thenThrow(new BadCredentialsException("invalid"));
-        UserSecurityService service = new UserSecurityService(manager, new JwtConfig(SECRET), mock(UserRepository.class));
+        UserSecurityService service = new UserSecurityService(manager, jwtConfig(), mock(UserRepository.class));
 
         assertThrows(BadCredentialsException.class, () -> service.loginUser("alice", "wrong"));
     }
 
     @Test
     void rejectsInvalidTokenSignature() {
-        JwtConfig config = new JwtConfig(SECRET);
-        String token = JWT.create().withSubject("alice").withIssuer("mrodriguezul.com")
+        JwtConfig config = jwtConfig();
+        String token = JWT.create().withSubject("alice").withIssuer(ISSUER)
                 .withExpiresAt(Date.from(Instant.now().plusSeconds(60)))
                 .sign(Algorithm.HMAC256("11111111111111111111111111111111"));
 
@@ -67,17 +74,17 @@ class JwtAuthenticationTest {
 
     @Test
     void rejectsExpiredToken() {
-        JwtConfig config = new JwtConfig(SECRET);
-        String token = JWT.create().withSubject("alice").withIssuer("mrodriguezul.com")
+        JwtConfig config = jwtConfig();
+        String token = JWT.create().withSubject("alice").withIssuer(ISSUER)
                 .withExpiresAt(Date.from(Instant.now().minusSeconds(60)))
-                .sign(config.getJwtAlgorithm());
+                .sign(Algorithm.HMAC256(SECRET));
 
         assertFalse(config.isValid(token));
     }
 
     @Test
     void doesNotAuthenticateDisabledUserFromToken() throws Exception {
-        JwtConfig config = new JwtConfig(SECRET);
+        JwtConfig config = jwtConfig();
         UserDetails disabled = org.springframework.security.core.userdetails.User
                 .withUsername("alice").password("encoded").roles("ADMIN").disabled(true).build();
         UserDetailsServiceStub userDetailsService = new UserDetailsServiceStub(disabled);
@@ -92,7 +99,7 @@ class JwtAuthenticationTest {
 
     @Test
     void authenticatesEnabledUserWithUserDetailsAndNullCredentials() throws Exception {
-        JwtConfig config = new JwtConfig(SECRET);
+        JwtConfig config = jwtConfig();
         UserDetails enabled = org.springframework.security.core.userdetails.User
                 .withUsername("alice").password("encoded").roles("ASSISTANT").build();
         JwtFilter filter = new JwtFilter(config, new UserDetailsServiceStub(enabled));
