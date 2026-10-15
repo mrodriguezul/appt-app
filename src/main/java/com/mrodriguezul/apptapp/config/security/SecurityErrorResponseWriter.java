@@ -1,4 +1,4 @@
-package com.mrodriguezul.apptapp.security;
+package com.mrodriguezul.apptapp.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;

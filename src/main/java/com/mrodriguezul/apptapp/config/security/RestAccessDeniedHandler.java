@@ -1,4 +1,4 @@
-package com.mrodriguezul.apptapp.security;
+package com.mrodriguezul.apptapp.config.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
