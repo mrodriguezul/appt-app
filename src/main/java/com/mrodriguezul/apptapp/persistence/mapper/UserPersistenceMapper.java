@@ -10,39 +10,37 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface UserPersistenceMapper {
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRolesToDomain")
-    User toUsuario(UserEntity userEntity);
-
-    List<User> toUsuarios(List<UserEntity> userEntities);
+    User toModel(UserEntity userEntity);
 
     @InheritInverseConfiguration
     @Mapping(target = "roles", ignore = true)
-    UserEntity toUserEntity(User user);
-
-    List<UserEntity> toUserEntities(List<User> users);
+    UserEntity toEntity(User user);
 
     @Named("mapRolesToDomain")
     default List<Role> mapRolesToDomain(List<UserRoleEntity> roleEntities) {
-        if (roleEntities == null) {
-            return null;
-        }
-        return roleEntities.stream()
-                .map(this::mapSingleRole)
-                .collect(Collectors.toList());
+        return Optional.ofNullable(roleEntities)
+                .map(roles -> roles.stream()
+                        .map(this::mapSingleRole)
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
+    @Named("mapSingleRole")
     default Role mapSingleRole(UserRoleEntity roleEntity) {
-        if (roleEntity == null) {
-            return null;
-        }
-        Role role = new Role();
-        role.setName(roleEntity.getRole());
-        role.setGrantedDate(roleEntity.getGrantedDate());
-        return role;
+        return Optional.ofNullable(roleEntity)
+                .map(r -> {
+                    Role role = new Role();
+                    role.setName(r.getRole());
+                    role.setGrantedDate(r.getGrantedDate());
+                    return role;
+                })
+                .orElse(null);
     }
 }
