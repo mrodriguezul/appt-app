@@ -1,13 +1,12 @@
 package com.mrodriguezul.apptapp.web.controller;
 
-import com.mrodriguezul.apptapp.domain.model.User;
+import com.mrodriguezul.apptapp.domain.model.AuthenticationResult;
 import com.mrodriguezul.apptapp.domain.service.UserSecurityService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import com.mrodriguezul.apptapp.web.dto.LoginRequestDto;
+import com.mrodriguezul.apptapp.web.dto.LoginResponseDto;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -15,16 +14,13 @@ public class AuthController {
 
     private final UserSecurityService userSecurityService;
 
-    @Autowired
     public AuthController(UserSecurityService userSecurityService) {
         this.userSecurityService = userSecurityService;
     }
 
-    @RequestMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
-        String token = userSecurityService.loginUser(user);
-
-        System.out.println("Generated Token: " + token);
-        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token).body("Login successful");
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
+        AuthenticationResult authResult = userSecurityService.loginUser(request.username(), request.password());
+        return ResponseEntity.ok(new LoginResponseDto(authResult.token(), "Bearer", authResult.expiresIn()));
     }
 }

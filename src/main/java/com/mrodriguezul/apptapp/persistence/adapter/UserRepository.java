@@ -23,6 +23,6 @@ public class UserRepository implements IUserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userCrudRepository.findById(username).map(mapper::toUsuario);
+        return userCrudRepository.findById(username).map(mapper::toModel);
     }
 }

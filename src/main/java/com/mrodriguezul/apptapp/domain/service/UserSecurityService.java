@@ -1,10 +1,10 @@
 package com.mrodriguezul.apptapp.domain.service;
 
 import com.mrodriguezul.apptapp.config.JwtConfig;
+import com.mrodriguezul.apptapp.domain.model.AuthenticationResult;
 import com.mrodriguezul.apptapp.domain.model.User;
 import com.mrodriguezul.apptapp.persistence.adapter.UserRepository;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,16 +16,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserSecurityService implements UserDetailsService {
 
-    @Autowired
-    private ObjectProvider<AuthenticationManager> authenticationManagerProvider;
+    private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final UserRepository userRepository;
 
@@ -36,34 +35,31 @@ public class UserSecurityService implements UserDetailsService {
     // ROL -> AUTHORITIES mapping
     private static final Map<String, List<String>> ROLE_AUTHORITIES_MAP = Map.of(
         "ADMIN", List.of(AUTHORITY_DOCTOR, AUTHORITY_VIEW_SPECIALTIES),
-        "CUSTOMER", Arrays.asList(AUTHORITY_DOCTOR, AUTHORITY_VIEW_SPECIALTIES)
+        "ASSISTANT", List.of(AUTHORITY_DOCTOR, AUTHORITY_VIEW_SPECIALTIES)
     );
 
-    @Autowired
-    public UserSecurityService(JwtConfig jwtConfig, UserRepository userRepository) {
+    public UserSecurityService(@Lazy AuthenticationManager authenticationManager, JwtConfig jwtConfig, UserRepository userRepository) {
+        this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
         this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-
-        String[] roles = user.getRoles() != null && !user.getRoles().isEmpty() ?
-                user.getRoles().stream()
-                        .map(rol -> rol.getName())
-                        .toArray(String[]::new) :
-                new String[]{"NO-ROL"};
+        String[] roles = Optional.ofNullable(user.getRoles())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(rol -> rol.getName().toUpperCase())
+                .toArray(String[]::new);
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                //.roles(roles)
                 .authorities(this.getGrantedAuthorities(roles))
-                .accountLocked(user.getLocked())
-                .disabled(user.getDisabled())
+                .accountLocked(Boolean.TRUE.equals(user.getLocked()))
+                .disabled(Boolean.TRUE.equals(user.getDisabled()))
                 .build();
     }
 
@@ -85,14 +81,11 @@ public class UserSecurityService implements UserDetailsService {
         return authorities;
     }
 
-    public String loginUser(User user) {
-        AuthenticationManager authenticationManager = authenticationManagerProvider.getIfAvailable();
-        UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+    public AuthenticationResult loginUser(String username, String password) {
+        UsernamePasswordAuthenticationToken login = new UsernamePasswordAuthenticationToken(username, password);
         Authentication authentication = authenticationManager.authenticate(login);
-        //System.out.println(authentication.isAuthenticated());
-        //System.out.println(authentication.getPrincipal());
-        String token = jwtConfig.createToken(user.getUsername());
-        System.out.println("Generated Token: " + token);
-        return token;
+        UserDetails authenticatedUser = (UserDetails) authentication.getPrincipal();
+        String token = jwtConfig.createToken(authenticatedUser.getUsername());
+        return new AuthenticationResult(token, jwtConfig.getExpirationSeconds());
     }
 }
