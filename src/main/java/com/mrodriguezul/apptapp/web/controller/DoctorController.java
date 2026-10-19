@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,7 @@ public class DoctorController {
             @Parameter(name = "id", description = "ID of the doctor to search for", required = true, example = "1")
     })
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctor(@PathVariable Long id) {
         return doctorService.getDoctor(id)
                 .map(ResponseEntity::ok)
@@ -96,6 +98,7 @@ public class DoctorController {
             @Parameter(name = "identificationNumber", description = "Doctor's identification number", required = true, example = "12345678")
     })
     @GetMapping("/identification/{identificationNumber}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctorByIdentificationNumber(@PathVariable String identificationNumber) {
         return doctorService.getAllByDocumentNumber(identificationNumber)
                 .map(ResponseEntity::ok)
@@ -112,6 +115,7 @@ public class DoctorController {
             @Parameter(name = "documentNumber", description = "Doctor's identification number", required = true, example = "12345678")
     })
     @GetMapping("/identification/{documentTypeCode}/{documentNumber}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctorByIdentificationTypeAndNumber(
             @PathVariable String documentTypeCode,
             @PathVariable String documentNumber) {
@@ -126,6 +130,7 @@ public class DoctorController {
         @ApiResponse(responseCode = "400", description = "Invalid application")
     })
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> create(@RequestBody Doctor doctor) {
         if(doctor.getId() == null || !doctorService.existsById(doctor.getId())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.save(doctor));
@@ -139,6 +144,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "400", description = "Invalid application")
     })
     @PutMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> update(@RequestBody Doctor doctor) {
         if(doctor.getId() != null && doctorService.existsById(doctor.getId())) {
             return ResponseEntity.ok(doctorService.save(doctor));
@@ -151,6 +157,7 @@ public class DoctorController {
         @ApiResponse(responseCode = "204", description = "Doctor successfully removed"),
         @ApiResponse(responseCode = "404", description = "Doctors not found")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if(doctorService.existsById(id)){

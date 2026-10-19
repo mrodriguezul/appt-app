@@ -5,6 +5,7 @@ import com.mrodriguezul.apptapp.domain.service.AppointmentService;
 import com.mrodriguezul.apptapp.web.dto.AppointmentRequestDto;
 import com.mrodriguezul.apptapp.web.dto.AppointmentResponseDto;
 import com.mrodriguezul.apptapp.web.mapper.AppointmentWebMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/appointment")
+@SecurityRequirement(name = "bearerAuth")
 public class AppointmentController {
     private final AppointmentService appointmentService;
     private final AppointmentWebMapper appointmentWebMapper;
