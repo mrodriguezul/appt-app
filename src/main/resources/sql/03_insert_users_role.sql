@@ -5,6 +5,6 @@
 insert into users_role (username, role, granted_date) values
 ('admin', 'ADMIN', '2025-09-12 10:00:00');
 
--- Asignar rol CUSTOMER al usuario customer
+-- Asignar rol ASSISTANT al usuario assistant
 insert into users_role (username, role, granted_date) values
-('customer', 'CUSTOMER', '2025-09-12 10:00:00');
+('assistant', 'ASSISTANT', '2025-09-12 10:00:00');

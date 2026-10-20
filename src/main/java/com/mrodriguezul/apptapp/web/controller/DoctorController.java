@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Doctor", description = "Operations - doctors 👨‍🔬")
+@Tag(name = "Doctor", description = "Public doctor searches; detailed and administrative operations require ASSISTANT or ADMIN")
 @RestController
 @RequestMapping("/doctor")
 public class DoctorController {
@@ -29,13 +32,16 @@ public class DoctorController {
         this.doctorService = doctorService;
     }
 
-    @Operation(summary = "Get all the doctors", description = "Return a list of all the doctors")
+    @Operation(summary = "List doctors",
+            description = "Public operation that returns all doctors.")
+    @ApiResponse(responseCode = "200", description = "Doctors returned")
     @GetMapping
     public List<Doctor> getAll() {
         return doctorService.getAll();
     }
 
-    @Operation(summary = "Search for doctors by first or last name", description = "Returns a list of doctors that match the provided first or last name")
+    @Operation(summary = "Search doctors by name",
+            description = "Public operation that returns doctors matching the optional name or surname filters.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctors found"),
             @ApiResponse(responseCode = "404", description = "Doctors not found")
@@ -55,7 +61,8 @@ public class DoctorController {
         return ResponseEntity.ok(doctors);
     }
 
-    @Operation(summary = "Search for doctors by specialty", description = "Returns a list of doctors who belong to a specific specialty")
+    @Operation(summary = "Search doctors by specialty",
+            description = "Public operation that returns doctors assigned to a specialty.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctors found"),
             @ApiResponse(responseCode = "404", description = "No doctors could be found for the specialty")
@@ -72,46 +79,60 @@ public class DoctorController {
         return ResponseEntity.ok(doctors);
     }
 
-    @Operation(summary = "Get a doctor by ID", description = "Return a specific doctor by their ID")
+    @Operation(summary = "Get a doctor by ID",
+            description = "Returns a doctor by identifier. Requires ASSISTANT or ADMIN.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor found"),
-            @ApiResponse(responseCode = "404", description = "Doctor not found")
+            @ApiResponse(responseCode = "404", description = "Doctor not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid doctor identifier"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "User is not ASSISTANT or ADMIN")
     })
     @Parameters(value = {
             @Parameter(name = "id", description = "ID of the doctor to search for", required = true, example = "1")
     })
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctor(@PathVariable Long id) {
         return doctorService.getDoctor(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Search for a doctor by ID number", description = "A specific doctor returns by their identification number")
+    @Operation(summary = "Get a doctor by document number",
+            description = "Returns a doctor by document number. Requires ASSISTANT or ADMIN.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor found"),
-            @ApiResponse(responseCode = "404", description = "Doctor not found")
+            @ApiResponse(responseCode = "404", description = "Doctor not found"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "User is not ASSISTANT or ADMIN")
     })
     @Parameters(value = {
             @Parameter(name = "identificationNumber", description = "Doctor's identification number", required = true, example = "12345678")
     })
     @GetMapping("/identification/{identificationNumber}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctorByIdentificationNumber(@PathVariable String identificationNumber) {
         return doctorService.getAllByDocumentNumber(identificationNumber)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Search for a doctor by type and identification number", description = "A specific doctor returns by their type and identification number")
+    @Operation(summary = "Get a doctor by document type and number",
+            description = "Returns a doctor by document type code and number. Requires ASSISTANT or ADMIN.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor found"),
-            @ApiResponse(responseCode = "404", description = "Doctor not found")
+            @ApiResponse(responseCode = "404", description = "Doctor not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid document type code"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "User is not ASSISTANT or ADMIN")
     })
     @Parameters(value = {
             @Parameter(name = "documentTypeCode", description = "Code of the identification type", required = true, example = "01"),
             @Parameter(name = "documentNumber", description = "Doctor's identification number", required = true, example = "12345678")
     })
     @GetMapping("/identification/{documentTypeCode}/{documentNumber}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> getDoctorByIdentificationTypeAndNumber(
             @PathVariable String documentTypeCode,
             @PathVariable String documentNumber) {
@@ -120,12 +141,17 @@ public class DoctorController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Register a new doctor", description = "Save the information for a new doctor")
+    @Operation(summary = "Create a doctor",
+            description = "Admin-only operation that creates a doctor when the identifier is new.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(schema = @Schema(implementation = Doctor.class))))
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Doctor successfully created"),
-        @ApiResponse(responseCode = "400", description = "Invalid application")
+        @ApiResponse(responseCode = "400", description = "Doctor already exists or request is invalid"),
+        @ApiResponse(responseCode = "401", description = "Authentication required"),
+        @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> create(@RequestBody Doctor doctor) {
         if(doctor.getId() == null || !doctorService.existsById(doctor.getId())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.save(doctor));
@@ -133,12 +159,16 @@ public class DoctorController {
         return ResponseEntity.badRequest().build();
     }
 
-    @Operation(summary = "Update a doctor's information", description = "Update a doctor's information")
+    @Operation(summary = "Update a doctor",
+            description = "Admin-only operation that updates an existing doctor.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor successfully updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid application")
+            @ApiResponse(responseCode = "400", description = "Doctor identifier is missing or does not exist"),
+            @ApiResponse(responseCode = "401", description = "Authentication required"),
+            @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
     @PutMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Doctor> update(@RequestBody Doctor doctor) {
         if(doctor.getId() != null && doctorService.existsById(doctor.getId())) {
             return ResponseEntity.ok(doctorService.save(doctor));
@@ -146,11 +176,16 @@ public class DoctorController {
         return ResponseEntity.badRequest().build();
     }
 
-    @Operation(summary = "Remove a doctor by ID", description = "Remove the doctor specified by their ID")
+    @Operation(summary = "Delete a doctor",
+            description = "Admin-only operation that deletes a doctor by identifier.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Doctor successfully removed"),
-        @ApiResponse(responseCode = "404", description = "Doctors not found")
+        @ApiResponse(responseCode = "404", description = "Doctor not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid doctor identifier"),
+        @ApiResponse(responseCode = "401", description = "Authentication required"),
+        @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if(doctorService.existsById(id)){
