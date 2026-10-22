@@ -4,10 +4,7 @@ import com.mrodriguezul.apptapp.domain.model.Speciality;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -45,8 +42,8 @@ public record DoctorRequestDto(
         @Schema(description = "Phone number", example = "+51987654321")
         String phoneNumber,
 
-        @Schema(description = "Doctor specialty", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "ID of an existing medical specialty", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull
-        @Valid
-        Speciality especialidad
+        @Positive
+        Long specialityId
 ) {}

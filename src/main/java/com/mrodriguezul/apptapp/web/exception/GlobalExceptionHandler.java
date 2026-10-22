@@ -83,7 +83,11 @@ public class GlobalExceptionHandler {
         return errorResponse("Invalid request body", "The request body is invalid or malformed", HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler({ PatientAlreadyExistsException.class, PersonDataConflictException.class })
+    @ExceptionHandler({
+            PatientAlreadyExistsException.class,
+            DoctorAlreadyExistsException.class,
+            PersonDataConflictException.class
+    })
     public ResponseEntity<Map<String, Object>> handlePatientConflict(RuntimeException ex) {
         logger.error("Error Data conflict: ", ex);
         return errorResponse("Conflict", ex.getMessage(), HttpStatus.CONFLICT.value());

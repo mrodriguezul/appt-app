@@ -17,12 +17,12 @@ public interface DoctorPersistenceMapper {
         @Mapping(source = "personEntity.phoneNumber", target = "phoneNumber"),
         @Mapping(source = "specialityEntity", target = "especialidad")
     })
-    Doctor toDoctor(DoctorEntity doctorEntity);
+    Doctor toModel(DoctorEntity doctorEntity);
 
     @InheritInverseConfiguration
     @Mappings({
         @Mapping(source = "id", target = "personEntity.id"),
         @Mapping(target = "appointments", ignore = true)
     })
-    DoctorEntity toDoctorEntity(Doctor doctor);
+    DoctorEntity toEntity(Doctor doctor);
 }

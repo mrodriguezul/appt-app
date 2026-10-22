@@ -16,5 +16,5 @@ public record DoctorResponseDto(
         LocalDate dateOfBirth,
         String email,
         String phoneNumber,
-        Speciality especialidad
+        SpecialityResponseDto speciality
 ) {}
