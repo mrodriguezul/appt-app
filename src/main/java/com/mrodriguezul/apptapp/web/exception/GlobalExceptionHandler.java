@@ -36,6 +36,11 @@ public class GlobalExceptionHandler {
         return errorResponse("Schedule conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
     }
 
+    @ExceptionHandler(DoctorHasAppointmentsException.class)
+    public ResponseEntity<Map<String, Object>> handleDoctorHasAppointments(DoctorHasAppointmentsException ex) {
+        return errorResponse("Doctor cannot be deleted", ex.getMessage(), HttpStatus.CONFLICT.value());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         logger.error("Error interno del servidor: ", ex);
