@@ -127,7 +127,7 @@ public class DoctorRepository implements IDoctorRepository {
     }
 
     private SpecialityEntity resolveSpeciality(Doctor doctor) {
-        return Optional.ofNullable(doctor.getEspecialidad())
+        return Optional.ofNullable(doctor.getSpeciality())
                 .map(Speciality::getId)
                 .map(id -> entityManager.find(SpecialityEntity.class, id))
                 .orElseThrow(() -> new ResourceNotFoundException("Speciality not found"));

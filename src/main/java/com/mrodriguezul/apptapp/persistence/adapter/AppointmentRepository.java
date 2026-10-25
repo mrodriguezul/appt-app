@@ -68,6 +68,11 @@ public class AppointmentRepository implements IAppointmentRepository {
     }
 
     @Override
+    public boolean existsByDoctorId(Long doctorId) {
+        return appointmentCrudRepository.existsByDoctorEntity_Id(doctorId);
+    }
+
+    @Override
     public boolean existsByDoctorIdAndAppointmentDate(Long doctorId, LocalDateTime appointmentDate) {
         return appointmentCrudRepository.existsByDoctorEntity_IdAndAppointmentDate(doctorId, appointmentDate);
     }
