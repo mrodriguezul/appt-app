@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface PersonCrudRepository extends JpaRepository<PersonEntity, Long> {
     boolean existsByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber);
-    @EntityGraph(attributePaths = "patientEntity")
+    @EntityGraph(attributePaths = {"patientEntity", "doctorEntity"})
     Optional<PersonEntity> findByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber);
 }

@@ -1,23 +1,17 @@
 package com.mrodriguezul.apptapp.domain.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public class Doctor extends Person {
     private Speciality speciality;
-
-    public Doctor(Long id, Speciality speciality) {
+    public Doctor(Long id) {
         super(id);
-        this.speciality = speciality;
     }
-
-    public Doctor() {
-        super();
-    }
-
-    public void setEspecialidad(Speciality speciality) {
-        this.speciality = speciality;
-    }
-
-    public Speciality getEspecialidad() {
-        return speciality;
-    }
-
 }

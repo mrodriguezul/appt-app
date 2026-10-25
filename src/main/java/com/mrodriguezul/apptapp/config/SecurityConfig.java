@@ -54,7 +54,7 @@ public class SecurityConfig {
                                 "/doctor/*").hasAnyRole("ASSISTANT", "ADMIN")
                         //admin access
                         .requestMatchers(HttpMethod.POST, "/doctor").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/doctor").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/doctor/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/doctor/*").hasRole("ADMIN")
                         //private access for ASSISTANT and ADMIN
                         .requestMatchers(HttpMethod.GET, "/patient", "/patient/search",

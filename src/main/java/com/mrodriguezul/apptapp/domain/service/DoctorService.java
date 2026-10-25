@@ -1,56 +1,91 @@
 package com.mrodriguezul.apptapp.domain.service;
 
+import com.mrodriguezul.apptapp.domain.exception.DoctorHasAppointmentsException;
+import com.mrodriguezul.apptapp.domain.exception.PersonDataConflictException;
+import com.mrodriguezul.apptapp.domain.exception.ResourceNotFoundException;
 import com.mrodriguezul.apptapp.domain.model.Doctor;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
+import com.mrodriguezul.apptapp.domain.repository.IAppointmentRepository;
 import com.mrodriguezul.apptapp.domain.repository.IDoctorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class DoctorService {
 
-    @Autowired
-    private IDoctorRepository IDoctorRepository;
+    private final IDoctorRepository doctorRepository;
+    private final IAppointmentRepository appointmentRepository;
+
+    public DoctorService(IDoctorRepository doctorRepository, IAppointmentRepository appointmentRepository) {
+        this.doctorRepository = doctorRepository;
+        this.appointmentRepository = appointmentRepository;
+    }
 
     public List<Doctor> getAll() {
-        return IDoctorRepository.findAll();
+        return doctorRepository.findAll();
     }
 
     public List<Doctor> getAllByNameOrSurname(String names, String surnames) {
-        return IDoctorRepository.findAllByNameOrSurname(names, surnames);
+        return doctorRepository.findAllByNameOrSurname(names, surnames);
     }
 
     public List<Doctor> getAllBySpeciality(Long specialityId) {
-        return IDoctorRepository.findAllBySpeciality(specialityId);
+        return doctorRepository.findAllBySpeciality(specialityId);
     }
 
     public Optional<Doctor> getAllByDocumentNumber(String documentNumber){
-        return IDoctorRepository.findByDocumentNumber(documentNumber);
+        return doctorRepository.findByDocumentNumber(documentNumber);
     }
 
     public Optional<Doctor> getDoctor(Long id) {
-        return IDoctorRepository.findById(id);
+        return doctorRepository.findById(id);
     }
 
     public Optional<Doctor> getDoctorByDocumentTypeAndDocumentNumber(DocumentType documentType, String documentNumber){
-        return IDoctorRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
+        return doctorRepository.findByDocumentTypeAndDocumentNumber(documentType, documentNumber);
     }
 
-    public Doctor save(Doctor doctor) {
-        return IDoctorRepository.save(doctor);
+    @Transactional
+    public Doctor create(Doctor doctor) {
+        if (doctor.getId() != null) {
+            throw new IllegalArgumentException("A new doctor must not have an ID");
+        }
+        return doctorRepository.save(doctor);
     }
 
-    public boolean delete(Long id) {
-        return getDoctor(id).map(doctor -> {
-            IDoctorRepository.delete(id);
-            return true;
-        }).orElse(false);
+    @Transactional
+    public Doctor update(Long id, Doctor doctor) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid doctor ID");
+        }
+
+        Doctor existing = doctorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+
+        if (doctor.getDocumentType() != existing.getDocumentType() || !Objects.equals(doctor.getDocumentNumber(), existing.getDocumentNumber())) {
+            throw new PersonDataConflictException("Doctor identification cannot be changed");
+        }
+
+        doctor.setId(id);
+        return doctorRepository.save(doctor);
     }
 
-    public boolean existsById(Long id) {
-        return IDoctorRepository.existsById(id);
+    @Transactional
+    public void delete(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Invalid doctor ID");
+        }
+        if (!doctorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Doctor not found");
+        }
+        if (appointmentRepository.existsByDoctorId(id)) {
+            throw new DoctorHasAppointmentsException("Doctor cannot be deleted while appointments exist");
+        }
+
+        doctorRepository.delete(id);
     }
 }

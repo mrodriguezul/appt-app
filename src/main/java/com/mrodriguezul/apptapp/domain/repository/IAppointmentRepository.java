@@ -11,5 +11,6 @@ public interface IAppointmentRepository {
     Appointment update(Long id, Appointment appointment);
     List<Appointment> findAll();
     Optional<Appointment> findById(Long id);
+    boolean existsByDoctorId(Long doctorId);
     boolean existsByDoctorIdAndAppointmentDate(Long doctorId, LocalDateTime appointmentDate);
 }

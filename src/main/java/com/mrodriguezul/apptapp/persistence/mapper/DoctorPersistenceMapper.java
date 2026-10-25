@@ -15,14 +15,14 @@ public interface DoctorPersistenceMapper {
         @Mapping(source = "personEntity.dateOfBirth", target = "dateOfBirth"),
         @Mapping(source = "personEntity.email", target = "email"),
         @Mapping(source = "personEntity.phoneNumber", target = "phoneNumber"),
-        @Mapping(source = "specialityEntity", target = "especialidad")
+        @Mapping(source = "specialityEntity", target = "speciality")
     })
-    Doctor toDoctor(DoctorEntity doctorEntity);
+    Doctor toModel(DoctorEntity doctorEntity);
 
     @InheritInverseConfiguration
     @Mappings({
         @Mapping(source = "id", target = "personEntity.id"),
         @Mapping(target = "appointments", ignore = true)
     })
-    DoctorEntity toDoctorEntity(Doctor doctor);
+    DoctorEntity toEntity(Doctor doctor);
 }

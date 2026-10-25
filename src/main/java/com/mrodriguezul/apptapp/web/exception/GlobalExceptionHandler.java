@@ -36,6 +36,11 @@ public class GlobalExceptionHandler {
         return errorResponse("Schedule conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
     }
 
+    @ExceptionHandler(DoctorHasAppointmentsException.class)
+    public ResponseEntity<Map<String, Object>> handleDoctorHasAppointments(DoctorHasAppointmentsException ex) {
+        return errorResponse("Doctor cannot be deleted", ex.getMessage(), HttpStatus.CONFLICT.value());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         logger.error("Error interno del servidor: ", ex);
@@ -83,7 +88,11 @@ public class GlobalExceptionHandler {
         return errorResponse("Invalid request body", "The request body is invalid or malformed", HttpStatus.BAD_REQUEST.value());
     }
 
-    @ExceptionHandler({ PatientAlreadyExistsException.class, PersonDataConflictException.class })
+    @ExceptionHandler({
+            PatientAlreadyExistsException.class,
+            DoctorAlreadyExistsException.class,
+            PersonDataConflictException.class
+    })
     public ResponseEntity<Map<String, Object>> handlePatientConflict(RuntimeException ex) {
         logger.error("Error Data conflict: ", ex);
         return errorResponse("Conflict", ex.getMessage(), HttpStatus.CONFLICT.value());
