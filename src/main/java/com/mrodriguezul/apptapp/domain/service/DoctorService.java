@@ -64,9 +64,6 @@ public class DoctorService {
         Doctor existing = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
 
-        if (doctor.getId() != null && !Objects.equals(doctor.getId(), id)) {
-            throw new IllegalArgumentException("Doctor ID mismatch");
-        }
         if (doctor.getDocumentType() != existing.getDocumentType() || !Objects.equals(doctor.getDocumentNumber(), existing.getDocumentNumber())) {
             throw new PersonDataConflictException("Doctor identification cannot be changed");
         }

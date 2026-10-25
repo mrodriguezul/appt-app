@@ -10,10 +10,6 @@ import java.time.LocalDate;
 
 @Schema(description = "Doctor data used to create or update a doctor")
 public record DoctorRequestDto(
-        @Schema(description = "Doctor identifier. Required by the current update contract",
-                example = "1")
-        Long id,
-
         @Schema(description = "Document type", example = "DNI", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull
         DocumentType documentType,

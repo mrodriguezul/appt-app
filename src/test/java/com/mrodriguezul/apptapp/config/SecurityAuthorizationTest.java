@@ -91,7 +91,7 @@ class SecurityAuthorizationTest {
     @WithMockUser(roles = "ASSISTANT")
     void assistantCannotModifyDoctors() throws Exception {
         mockMvc.perform(post("/doctor")).andExpect(status().isForbidden());
-        mockMvc.perform(put("/doctor")).andExpect(status().isForbidden());
+        mockMvc.perform(put("/doctor/1")).andExpect(status().isForbidden());
         mockMvc.perform(delete("/doctor/1")).andExpect(status().isForbidden());
     }
 
@@ -102,7 +102,7 @@ class SecurityAuthorizationTest {
         mockMvc.perform(get("/appointment")).andExpect(status().isOk());
         mockMvc.perform(get("/doctor/1")).andExpect(status().isOk());
         mockMvc.perform(post("/doctor")).andExpect(status().isOk());
-        mockMvc.perform(put("/doctor")).andExpect(status().isOk());
+        mockMvc.perform(put("/doctor/1")).andExpect(status().isOk());
         mockMvc.perform(delete("/doctor/1")).andExpect(status().isOk());
     }
 
@@ -143,7 +143,7 @@ class SecurityAuthorizationTest {
         @PostMapping("/doctor")
         void createDoctor() {}
 
-        @PutMapping("/doctor")
+        @PutMapping("/doctor/{id}")
         void updateDoctor() {}
 
         @DeleteMapping("/doctor/{id}")

@@ -177,16 +177,20 @@ public class DoctorController {
             description = "Admin-only operation that updates an existing doctor.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Doctor successfully updated"),
-            @ApiResponse(responseCode = "400", description = "Doctor identifier is missing or does not exist"),
+            @ApiResponse(responseCode = "400", description = "Invalid doctor identifier or request"),
+            @ApiResponse(responseCode = "404", description = "Doctor not found"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
             @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
-    @PutMapping
+    @PutMapping("/{id}")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<DoctorResponseDto> update(@Valid @RequestBody DoctorRequestDto request) {
-        Doctor doctor = doctorWebMapper.toModel(request);
-        Doctor updatedDoctor = doctorService.update(doctor.getId(), doctor);
-        return ResponseEntity.ok(doctorWebMapper.toResponse(updatedDoctor));
+    @Parameter(name = "id", description = "ID of the doctor to update", required = true, example = "1")
+    public ResponseEntity<DoctorResponseDto> update(
+                @PathVariable Long id,
+                @Valid @RequestBody DoctorRequestDto request) {
+            Doctor doctor = doctorWebMapper.toModel(request);
+            Doctor updatedDoctor = doctorService.update(id, doctor);
+            return ResponseEntity.ok(doctorWebMapper.toResponse(updatedDoctor));
     }
 
     @Operation(summary = "Delete a doctor",
