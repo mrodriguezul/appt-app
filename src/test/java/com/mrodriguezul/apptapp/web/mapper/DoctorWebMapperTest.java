@@ -6,15 +6,27 @@ import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import com.mrodriguezul.apptapp.web.dto.DoctorRequestDto;
 import com.mrodriguezul.apptapp.web.dto.DoctorResponseDto;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DoctorWebMapperTest.MapperConfiguration.class)
 class DoctorWebMapperTest {
-    private final SpecialityWebMapper specialityMapper = Mappers.getMapper(SpecialityWebMapper.class);
-    private final DoctorWebMapper mapper = new DoctorWebMapperImpl(specialityMapper);
+    @Autowired
+    private DoctorWebMapper mapper;
+
+    @Configuration
+    @ComponentScan(basePackageClasses = DoctorWebMapper.class)
+    static class MapperConfiguration {
+    }
 
     @Test
     void toModel_shouldMapRequestAndSpecialityId() {

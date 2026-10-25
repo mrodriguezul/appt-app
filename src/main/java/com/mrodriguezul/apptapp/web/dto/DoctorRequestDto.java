@@ -1,9 +1,7 @@
 package com.mrodriguezul.apptapp.web.dto;
 
-import com.mrodriguezul.apptapp.domain.model.Speciality;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
