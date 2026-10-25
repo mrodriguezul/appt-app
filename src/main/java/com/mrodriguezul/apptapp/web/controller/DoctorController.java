@@ -168,12 +168,9 @@ public class DoctorController {
     @PostMapping
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<DoctorResponseDto> create(@Valid @RequestBody DoctorRequestDto request) {
-        Doctor doctor = doctorWebMapper.toModel(request);
-        if(doctor.getId() == null || !doctorService.existsById(doctor.getId())) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(doctorWebMapper.toResponse(doctorService.save(doctor)));
-        }
-        return ResponseEntity.badRequest().build();
+        Doctor doctor = doctorService.create(doctorWebMapper.toModel(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(doctorWebMapper.toResponse(doctor));
     }
 
     @Operation(summary = "Update a doctor",
@@ -188,10 +185,8 @@ public class DoctorController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<DoctorResponseDto> update(@Valid @RequestBody DoctorRequestDto request) {
         Doctor doctor = doctorWebMapper.toModel(request);
-        if(doctor.getId() != null && doctorService.existsById(doctor.getId())) {
-            return ResponseEntity.ok(doctorWebMapper.toResponse(doctorService.save(doctor)));
-        }
-        return ResponseEntity.badRequest().build();
+        Doctor updatedDoctor = doctorService.update(doctor.getId(), doctor);
+        return ResponseEntity.ok(doctorWebMapper.toResponse(updatedDoctor));
     }
 
     @Operation(summary = "Delete a doctor",
@@ -206,11 +201,7 @@ public class DoctorController {
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if(doctorService.existsById(id)){
-            doctorService.delete(id);
-            return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+        doctorService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
