@@ -15,7 +15,7 @@ public interface DoctorPersistenceMapper {
         @Mapping(source = "personEntity.dateOfBirth", target = "dateOfBirth"),
         @Mapping(source = "personEntity.email", target = "email"),
         @Mapping(source = "personEntity.phoneNumber", target = "phoneNumber"),
-        @Mapping(source = "specialityEntity", target = "especialidad")
+        @Mapping(source = "specialityEntity", target = "speciality")
     })
     Doctor toModel(DoctorEntity doctorEntity);
 

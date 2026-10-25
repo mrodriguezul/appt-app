@@ -5,8 +5,8 @@ import com.mrodriguezul.apptapp.domain.exception.PersonDataConflictException;
 import com.mrodriguezul.apptapp.domain.exception.ResourceNotFoundException;
 import com.mrodriguezul.apptapp.domain.model.Doctor;
 import com.mrodriguezul.apptapp.domain.model.enums.DocumentType;
+import com.mrodriguezul.apptapp.domain.repository.IAppointmentRepository;
 import com.mrodriguezul.apptapp.domain.repository.IDoctorRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +18,11 @@ import java.util.Optional;
 public class DoctorService {
 
     private final IDoctorRepository doctorRepository;
+    private final IAppointmentRepository appointmentRepository;
 
-    public DoctorService(IDoctorRepository doctorRepository) {
+    public DoctorService(IDoctorRepository doctorRepository, IAppointmentRepository appointmentRepository) {
         this.doctorRepository = doctorRepository;
+        this.appointmentRepository = appointmentRepository;
     }
 
     public List<Doctor> getAll() {
@@ -80,11 +82,10 @@ public class DoctorService {
         if (!doctorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Doctor not found");
         }
-
-        try {
-            doctorRepository.delete(id);
-        } catch (DataIntegrityViolationException ex) {
-            throw new DoctorHasAppointmentsException("Doctor cannot be deleted while appointments exist", ex);
+        if (appointmentRepository.existsByDoctorId(id)) {
+            throw new DoctorHasAppointmentsException("Doctor cannot be deleted while appointments exist");
         }
+
+        doctorRepository.delete(id);
     }
 }

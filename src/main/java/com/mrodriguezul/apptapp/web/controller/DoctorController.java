@@ -161,7 +161,8 @@ public class DoctorController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(schema = @Schema(implementation = DoctorRequestDto.class))))
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Doctor successfully created"),
-        @ApiResponse(responseCode = "400", description = "Doctor already exists or request is invalid"),
+        @ApiResponse(responseCode = "400", description = "Request is invalid"),
+        @ApiResponse(responseCode = "409", description = "Doctor already exists or personal data conflicts"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
@@ -179,6 +180,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "200", description = "Doctor successfully updated"),
             @ApiResponse(responseCode = "400", description = "Invalid doctor identifier or request"),
             @ApiResponse(responseCode = "404", description = "Doctor not found"),
+            @ApiResponse(responseCode = "409", description = "Doctor identification conflicts with existing data"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
             @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
@@ -199,6 +201,7 @@ public class DoctorController {
         @ApiResponse(responseCode = "204", description = "Doctor successfully removed"),
         @ApiResponse(responseCode = "404", description = "Doctor not found"),
         @ApiResponse(responseCode = "400", description = "Invalid doctor identifier"),
+        @ApiResponse(responseCode = "409", description = "Doctor has appointments"),
         @ApiResponse(responseCode = "401", description = "Authentication required"),
         @ApiResponse(responseCode = "403", description = "ADMIN role required")
     })
